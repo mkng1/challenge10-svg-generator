@@ -1,135 +1,95 @@
 // TODO: Include packages needed for this application
 const inquirer = require('inquirer');
 const fs = require('fs');
-let badge = '';
+
+class Shape {
+    constructor(shape, shapeColor, design) {
+      this.shape = shape;
+      this.shapeColor = shapeColor;
+    }
+    render() {
+        return design
+    }
+}
+
+class Triangle extends Shape {
+    constructor(shape, shapeColor) {
+        super(shape, shapeColor);
+        this.design = '<polygon points="150, 18 244, 182 56, 182"';
+      }
+
+}
+
+class Square extends Shape {
+    constructor(shape, shapeColor) {
+        super(shape, shapeColor);
+        this.design = '<rect x="50" y="0" width="200" height="200"';
+      }
+
+}
+
+class Circle extends Shape {
+    constructor(shape, shapeColor) {
+        super(shape, shapeColor);
+        this.design = '<circle cx="150" cy="100" r="80"';
+      }
+
+}
 
 
 
 // TODO: Create an array of questions for user input
 const questions = [{
         type: 'input',
-        name: 'username',
-        message: 'What is your Github username?',
+        name: 'text',
+        message: 'Enter text for the logo. (Must not be more than 3 characters.)',
     },
     {
         type: 'input',
-        name: 'email',
-        message: 'What is your email address?',
-    },
-    {
-        type: 'input',
-        name: 'projectName',
-        message: "What is your project's name?",
-    },
-    {
-        type: 'input',
-        name: 'description',
-        message: 'Please write a short description of your project',
+        name: 'textColor',
+        message: 'Enter a text color',
     },
     {
         type: 'list',
-        message: 'What kind of license should your project have?',
-        name: 'license',
-        choices: ['MIT', 'APACHE 2.0', 'GPL 3.0', 'BSD 3', 'None'],
+        message: 'Select a shape for the logo',
+        name: 'shape',
+        choices: ['circle', 'square', 'triangle'],
     },
     {
         type: 'input',
-        name: 'installCommand',
-        default: 'npm i',
-        message: 'What command should be run to install dependencies?',
-    },
-    {
-        type: 'input',
-        name: 'testCommand',
-        default: 'npm test',
-        message: 'What command should be run to run tests?',
-    },
-    {
-        type: 'input',
-        name: 'usage',
-        message: 'What does the user need to know about using the repo?',
-    },
-    {
-        type: 'input',
-        name: 'contribute',
-        message: 'What does the user need to know about contributing to the repo?',
+        name: 'shapeColor',
+        message: 'Enter a shape color',
     }];
 
-// TODO: Create a function to write README file
-const generateReadme = ({ username, email, projectName, description, license, installCommand, testCommand, usage, contribute }) => 
-`# ${projectName}
+// TODO: Create a function to write SVG file
+const generateSVG = ({ text, textColor, shapeColor }) => 
+`<svg version="1.1" width="300" height="200" xmlns="http://www.w3.org/2000/svg">
 
-${badge}
+${design} fill="${shapeColor}" />
 
-## Description
+<text x="150" y="125" font-size="60" text-anchor="middle" fill="${textColor}">${text}</text>
 
-${description}
-
-## Table of Contents
-
-* [Installation](#installation)
-
-* [Usage](#usage)
-
-* [License](#license)
-
-* [Contributing](#contributing)
-
-* [Tests](#tests)
-
-* [Questions](#questions)
-
-## Installation
-
-To install necessary dependencies, run the following command:
-
-\`\`\`
-${installCommand}
-\`\`\`
-
-## Usage
-
-${usage}
-
-## License
-
-This project is licensed under the ${license} license.
-
-## Contributing
-
-${contribute}
-
-## Tests
-
-To run tests, run the following command:
-
-\`\`\`
-${testCommand}
-\`\`\`
-
-## Questions
-
-If you have any questions about the repo, open an issue or contact me directly at ${email}. You can find more of my work at [${username}](https://github.com/${username}/).`
+</svg>`
 
 // TODO: Create a function to initialize app
 function init() {
     inquirer
     .prompt(questions)
     .then((answers) => {
-        if (answers.license === 'MIT') {
-            badge = '[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)'
-        } else if (answers.license === 'APACHE 2.0') {
-            badge = '[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)'
-        } else if (answers.license === 'GPL 3.0') {
-            badge = '[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)'
-        } else if (answers.license === 'BSD 3') {
-            badge = '[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)'
+        if (answers.text.length < 4 ) {
+            if (answers.shape === 'circle') {
+                design = '<circle cx="150" cy="100" r="80"'
+            } else if (answers.shape === 'square') {
+                design = '<rect x="50" y="0" width="200" height="200"'
+            } else if (answers.shape === 'triangle') {
+                design = '<polygon points="150, 18 244, 182 56, 182"'
+            }
         } else {
-            badge = ''
+            return console.log("the text is too long for the logo");
         }
-    const readmeContent = generateReadme(answers);
-    fs.writeFile('README.md', readmeContent, (err) =>
-      err ? console.log(err) : console.log('Successfully created README.md!')
+    const svgContent = generateSVG(answers);
+    fs.writeFile('logo.svg', svgContent, (err) =>
+      err ? console.log(err) : console.log('Successfully created logo.svg!')
     );
   });
 }
